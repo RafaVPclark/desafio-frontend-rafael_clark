@@ -29,7 +29,13 @@ background: #0b971e80;
 box-shadow:4px 6px 16px #fdfdfd80;
 color: #fff;
 }
-
+.card{
+  border: 1px solid #00500b;
+}
+.card-body{
+  background: #00500b;
+  color: #fff;
+}
 .margin{
   border: 1px solid red;
 }

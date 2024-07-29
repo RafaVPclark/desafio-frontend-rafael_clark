@@ -15,7 +15,7 @@ function App() {
     // Função para buscar os dados da API
     const fetchHeroes = async () => {
       try {
-        // API não estava retornando corretamente durante a minha prova então utilizei dados falsos
+        // API não estava retornando corretamente durante toda a minha prova então utilizei dados falsos. Funcionou apenas uma vez e depois nem quando eu tentava acessar a URL. Não alterei o código para recuperar os dados então acredito que o erro tenha sido da própria Api
         // const response = await fetch('http://homologacao3.azapfy.com.br/api/ps/metahumans');
         // if (!response.ok) throw new Error('Resposta da api não funcionou');
         // const data = await response.json();
