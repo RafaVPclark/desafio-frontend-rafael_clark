@@ -5,9 +5,31 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(63, 60, 60);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.card:hover{
+  box-shadow:8px 12px 32px #0b971e80;
+}
+.btn-custom{
+  width: 100%;
+  border: none;
+  color: #fff;
+  background: #0b971e80;
+  transition: all 0.3s ease;
+}
+.btn-custom:hover{
+transform: scale(1.04);
+background: #0b971e80;
+box-shadow:4px 6px 16px #fdfdfd80;
+color: #fff;
+}
+
+.margin{
+  border: 1px solid red;
 }
