@@ -16,25 +16,23 @@ function App() {
     // Função para buscar os dados da API
     const fetchHeroes = async () => {
       try {
-        // API não estava retornando corretamente durante toda a minha prova então utilizei dados falsos. Funcionou apenas uma vez e depois nem quando eu tentava acessar a URL. Não alterei o código para recuperar os dados então acredito que o erro tenha sido da própria Api
-        // const response = await fetch('http://homologacao3.azapfy.com.br/api/ps/metahumans');
-        // if (!response.ok) throw new Error('Resposta da api não funcionou');
-        // const data = await response.json();
-        // console.log(data);
+        const response = await fetch('http://homologacao3.azapfy.com.br/api/ps/metahumans');
+        if (!response.ok) throw new Error('Resposta da api não funcionou');
+        const data = await response.json();
+        setHeroes(data);
+        setFilteredHeroes(data);
+        console.log(data);
 
         // Dados falsos para teste
-        // Não consegui visualizar na Api como seria o powerstatus então eu imagino que seja dessa forma:
-        const dadosFalsos = [
-          { id: 1, name: 'Superman', image: 'https://via.placeholder.com/150', powerstatus: 100 },
-          { id: 2, name: 'Batman', image: 'https://via.placeholder.com/150', powerstatus: 60 },
-          { id: 3, name: 'Batgirl', image: 'https://via.placeholder.com/150', powerstatus: 65 },
-          { id: 4, name: 'Wonder Woman', image: 'https://via.placeholder.com/150', powerstatus: 90 },
-          { id: 5, name: 'Batman2', image: 'https://via.placeholder.com/150', powerstatus: 120 },
-        ];
+        // const dadosFalsos = [
+        //   { id: 1, name: 'Superman', image: 'https://via.placeholder.com/150', powerstats: { combat: 100, durability: 90, intelligence: 80, power: 70, speed: 60, strength: 110 } },
+        //   { id: 2, name: 'Batman', image: 'https://via.placeholder.com/150', powerstats: { combat: 80, durability: 70, intelligence: 90, power: 60, speed: 50, strength: 70 } },
+        //   // Adicione mais dados de teste aqui
+        // ];
 
-        console.log('Dados recebidos:', dadosFalsos); // Log dos dados falsos
-        setHeroes(dadosFalsos); // Armazenar os dados no estado
-        setFilteredHeroes(dadosFalsos); // Inicialmente, mostrar todos os heróis
+        // console.log('Dados recebidos:', dadosFalsos); // Log dos dados falsos
+        // setHeroes(dadosFalsos); // Armazenar os dados no estado
+        // setFilteredHeroes(dadosFalsos); // Inicialmente, mostrar todos os heróis
 
       } catch (error) {
         console.error('Error fetching the heroes:', error);
@@ -72,11 +70,28 @@ function App() {
     }
   };
 
+  // Função para calcular a soma dos atributos de powerstats
+const calcularSomaPowerstats = (powerstats) => {
+  let total = 0;
+
+  // Itera sobre cada atributo em powerstats e soma os valores
+  Object.keys(powerstats).forEach(key => {
+    total += powerstats[key];
+  });
+
+  return total;
+};
+
   // Função para calcular o herói vencedor
   const calcularVencedor = (heroesToCompare) => {
     if (heroesToCompare.length < 2) return;
     
-    const vencedor = heroesToCompare.reduce((max, hero) => (hero.powerstatus > max.powerstatus ? hero : max), heroesToCompare[0]);
+    const vencedor = heroesToCompare.reduce((max, hero) => {
+      const somaAtual = calcularSomaPowerstats(hero.powerstats);
+      const somaMax = calcularSomaPowerstats(max.powerstats);
+      return somaAtual > somaMax ? hero : max;
+    }, heroesToCompare[0]);
+
     setWinner(vencedor);
     setShowModal(true);
   };
@@ -118,9 +133,9 @@ function App() {
               <div
                 className={`card card-animacao mx-auto ${selectedHeroes.find(h => h.id === hero.id) ? 'borda-clicada' : ''}`}
                 style={{ width: '18rem' }}
-                onClick={() => selecionarHeroi(hero)} // Adiciona um clique ao card
+                onClick={() => selecionarHeroi(hero)}
               >
-                <img src={hero.image} className="card-img-top" alt={hero.name} />
+                <img src={hero.images.sm} className="card-img-top img-fluid" alt={hero.name} />
                 <div className="card-body">
                   <h5 className="card-title">{hero.name}</h5>
                 </div>
@@ -138,9 +153,23 @@ function App() {
         <Modal.Body>
           {winner ? (
             <div className="text-center">
-              <img src={winner.image} className="img-fluid mb-3" alt={winner.name} />
-              <h5>{winner.name}</h5>
-              <p>Atributo de Poder: {winner.powerstatus}</p>
+              <div className='container-fluid'>
+                <div className="row">
+                  {/* Mostrar metade do modal para a imagem e a outra metade para os atributos */}
+                  <div className="col-6">
+                    <img src={winner.images.sm} className="img-fluid" alt={winner.name} />  
+                  </div>
+                  <div className="col-6">
+                    <h5 className="nome-vencedor">{winner.name}</h5>
+                    <h5>Combate: {winner.powerstats.combat}</h5>
+                    <h5>Durabilidade: {winner.powerstats.durability}</h5>
+                    <h5>Inteligência: {winner.powerstats.intelligence}</h5>
+                    <h5>Poder: {winner.powerstats.power}</h5>
+                    <h5>Velocidade: {winner.powerstats.speed}</h5>
+                    <h5>Força: {winner.powerstats.strength}</h5>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <p>Nenhum herói selecionado.</p>
