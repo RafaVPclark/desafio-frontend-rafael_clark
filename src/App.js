@@ -10,6 +10,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false); // Estado para controlar o modal
   const [winner, setWinner] = useState(null); // Estado para armazenar o herói vencedor
+  const [selectedHeroes, setSelectedHeroes] = useState([]); // Estado para armazenar os heróis selecionados
 
   useEffect(() => {
     // Função para buscar os dados da API
@@ -25,11 +26,12 @@ function App() {
         // Não consegui visualizar na Api como seria o powerstatus então eu imagino que seja dessa forma:
         const dadosFalsos = [
           { id: 1, name: 'Superman', image: 'https://via.placeholder.com/150', powerstatus: 100 },
-          { id: 2, name: 'Batman', image: 'https://via.placeholder.com/150', powerstatus: 80 },
-          { id: 3, name: 'Batgirl', image: 'https://via.placeholder.com/150', powerstatus: 90 },
-          { id: 4, name: 'Wonder Woman', image: 'https://via.placeholder.com/150', powerstatus: 90 }
+          { id: 2, name: 'Batman', image: 'https://via.placeholder.com/150', powerstatus: 60 },
+          { id: 3, name: 'Batgirl', image: 'https://via.placeholder.com/150', powerstatus: 65 },
+          { id: 4, name: 'Wonder Woman', image: 'https://via.placeholder.com/150', powerstatus: 90 },
+          { id: 5, name: 'Batman2', image: 'https://via.placeholder.com/150', powerstatus: 120 },
         ];
-        
+
         console.log('Dados recebidos:', dadosFalsos); // Log dos dados falsos
         setHeroes(dadosFalsos); // Armazenar os dados no estado
         setFilteredHeroes(dadosFalsos); // Inicialmente, mostrar todos os heróis
@@ -55,12 +57,35 @@ function App() {
     setFilteredHeroes(filtered);
   };
 
+  // Função para selecionar heróis
+  const selecionarHeroi = (hero) => {
+    const alreadySelected = selectedHeroes.find(h => h.id === hero.id);
+
+    if (alreadySelected) {
+      setSelectedHeroes(selectedHeroes.filter(h => h.id !== hero.id));
+    } else if (selectedHeroes.length < 2) {
+      setSelectedHeroes([...selectedHeroes, hero]);
+      // Se há exatamente 2 heróis selecionados, calcular o vencedor automaticamente
+      if (selectedHeroes.length === 1) {
+        calcularVencedor([hero, ...selectedHeroes]);
+      }
+    }
+  };
+
   // Função para calcular o herói vencedor
-  const calcularVencedor = () => {
-    if (filteredHeroes.length === 0) return;
-    const vencedor = filteredHeroes.reduce((max, hero) => (hero.powerstatus > max.powerstatus ? hero : max), filteredHeroes[0]);
+  const calcularVencedor = (heroesToCompare) => {
+    if (heroesToCompare.length < 2) return;
+    
+    const vencedor = heroesToCompare.reduce((max, hero) => (hero.powerstatus > max.powerstatus ? hero : max), heroesToCompare[0]);
     setWinner(vencedor);
     setShowModal(true);
+  };
+
+  // Função para lidar com o clique do campo de filtrados para mais de 2 super herois
+  const iniciarCombate = () => {
+    if (selectedHeroes.length === 0) {
+      calcularVencedor(filteredHeroes);
+    }
   };
 
   return (
@@ -78,7 +103,7 @@ function App() {
             <button
               className="btn btn-custom ms-3"
               type="button"
-              onClick={calcularVencedor}
+              onClick={iniciarCombate}
             >
               Iniciar combate
             </button>
@@ -90,7 +115,11 @@ function App() {
           {/* Renderizar os cards dinamicamente */}
           {filteredHeroes.map(hero => (
             <div className="col-12 col-md-4 col-lg-3 mx-auto mt-5" key={hero.id}>
-              <div className="card card-animacao mx-auto" style={{ width: '18rem' }}>
+              <div
+                className={`card card-animacao mx-auto ${selectedHeroes.find(h => h.id === hero.id) ? 'borda-clicada' : ''}`}
+                style={{ width: '18rem' }}
+                onClick={() => selecionarHeroi(hero)} // Adiciona um clique ao card
+              >
                 <img src={hero.image} className="card-img-top" alt={hero.name} />
                 <div className="card-body">
                   <h5 className="card-title">{hero.name}</h5>
@@ -101,7 +130,7 @@ function App() {
         </div>
       </div>
 
-      {/* Modal para exibir o herói vencedor do bootstrap */}
+      {/* Modal para exibir o herói vencedor */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Herói Vencedor</Modal.Title>
